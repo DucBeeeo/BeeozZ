@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .left-section {
+            width: 65%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            font-size: 24px;
+            font-weight: normal;
+        }
+
+        .header h2 span {
+            font-weight: bold;
+        }
+
+        .search-add {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-add input {
+            padding: 8px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .add-btn {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .employee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .employee-table th, .employee-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .employee-table th {
+            background-color: #f1f1f1;
+        }
+
+        .edit-btn, .delete-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .edit-btn:hover {
+            color: #007bff;
+        }
+
+        .delete-btn:hover {
+            color: #dc3545;
+        }
+
+        .summary {
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .right-section {
+            width: 30%;
+            padding-left: 20px;
+        }
+
+        .employee-form {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f1f1f1;
+        }
+
+        .employee-form h3 {
+            margin-bottom: 20px;
+        }
+
+        .employee-form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .employee-form input, .employee-form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-buttons button[type="submit"] {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .form-buttons button[type="reset"] {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Section: Table and Summary -->
+        <div class="left-section">
+            <div class="header">
+                <h2>Employee <span>Management</span></h2>
+                <div class="search-add">
+                    <input type="text" placeholder="Search...">
+                    <button class="add-btn">+ Add New</button>
+                </div>
+            </div>
+
+            <table class="employee-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Nguyen Van A</td>
+                        <td>Administration</td>
+                        <td>+84 777 797 979</td>
+                        <td>
+                            <button class="edit-btn">✏️</button>
+                            <button class="delete-btn">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Ho Van B</td>
+                        <td>Customer Service</td>
+                        <td>+84 777 123 456</td>
+                        <td>
+                            <button class="edit-btn">✏️</button>
+                            <button class="delete-btn">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Duong Thi C</td>
+                        <td>Human Resources</td>
+                        <td>+84 777 456 789</td>
+                        <td>
+                            <button class="edit-btn">✏️</button>
+                            <button class="delete-btn">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Ho Thi D</td>
+                        <td>Human Resources</td>
+                        <td>+84 777 456 321</td>
+                        <td>
+                            <button class="edit-btn">✏️</button>
+                            <button class="delete-btn">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Cao Thi E</td>
+                        <td>Human Resources</td>
+                        <td>+84 777 456 787</td>
+                        <td>
+                            <button class="edit-btn">✏️</button>
+                            <button class="delete-btn">🗑️</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="summary">
+                <p>Total Employee:</p>
+                <p>Administration: 1</p>
+                <p>Customer Service: 1</p>
+                <p>Human Resource: 3</p>
+            </div>
+        </div>
+
+        <!-- Right Section: Form -->
+        <div class="right-section">
+            <div class="employee-form">
+                <h3>Add / Edit Employee</h3>
+                <form>
+                    <label for="name">Name</label>
+                    <input type="text" id="name" placeholder="Enter name">
+
+                    <label for="department">Department</label>
+                    <select id="department">
+                        <option>Select Department</option>
+                        <option>Administration</option>
+                        <option>Customer Service</option>
+                        <option>Human Resources</option>
+                    </select>
+
+                    <label for="phone">Phone</label>
+                    <input type="text" id="phone" placeholder="Enter phone. Ex: +84 xxx xxx xxx">
+
+                    <div class="form-buttons">
+                        <button type="submit">Submit</button>
+                        <button type="reset">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
