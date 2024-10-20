@@ -1,123 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Management</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .table td, .table th {
-            vertical-align: middle;
-        }
-        .form-control {
-            width: 100%;
-        }
-        .actions i {
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        .actions i:hover {
-            color: #007bff;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        <h3 class="mb-4">Employee <strong>Management</strong></h3>
-        <div class="row">
-            <div class="col-md-8">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Department</th>
-                            <th>Phone</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Nguyen Van A</td>
-                            <td>Administration</td>
-                            <td>+84 777 797 979</td>
-                            <td class="actions">
-                                <i class="fas fa-pencil-alt text-warning"></i>
-                                <i class="fas fa-trash-alt text-danger"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Ho Van B</td>
-                            <td>Customer Service</td>
-                            <td>+84 777 123 456</td>
-                            <td class="actions">
-                                <i class="fas fa-pencil-alt text-warning"></i>
-                                <i class="fas fa-trash-alt text-danger"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Duong Thi C</td>
-                            <td>Human Resources</td>
-                            <td>+84 777 456 789</td>
-                            <td class="actions">
-                                <i class="fas fa-pencil-alt text-warning"></i>
-                                <i class="fas fa-trash-alt text-danger"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Ho Thi D</td>
-                            <td>Human Resources</td>
-                            <td>+84 777 456 321</td>
-                            <td class="actions">
-                                <i class="fas fa-pencil-alt text-warning"></i>
-                                <i class="fas fa-trash-alt text-danger"></i>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Cao Thi E</td>
-                            <td>Human Resources</td>
-                            <td>+84 777 456 787</td>
-                            <td class="actions">
-                                <i class="fas fa-pencil-alt text-warning"></i>
-                                <i class="fas fa-trash-alt text-danger"></i>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="4">
-                                <strong>Total Employee:</strong>
-                                Administration: 1 | Customer Service: 1 | Human Resources: 3
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-            <div class="col-md-4">
-                <form>
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" class="form-control" id="name" placeholder="Enter name">
-                    </div>
-                    <div class="form-group">
-                        <label for="department">Department</label>
-                        <select id="department" class="form-control">
-                            <option>Select Department</option>
-                            <option>Administration</option>
-                            <option>Customer Service</option>
-                            <option>Human Resources</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone</label>
-                        <input type="text" class="form-control" id="phone" placeholder="Enter phone. Ex: +84 xxx xxx xxx">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <button type="reset" class="btn btn-secondary">Cancel</button>
-                </form>
-            </div>
-        </div>
-    </div>
+import { t } from '../trpc'; // Khởi tạo router với tRPC
+import { z } from 'zod'; // Thư viện giúp validate dữ liệu input
 
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-</body>
-</html>
+// Helper function để lấy employees từ localStorage
+const getEmployeesFromLocalStorage = () => {
+  const data = localStorage.getItem('employees');
+  return data ? JSON.parse(data) : [];
+};
+
+// Helper function để lưu employees vào localStorage
+const saveEmployeesToLocalStorage = (employees: any[]) => {
+  localStorage.setItem('employees', JSON.stringify(employees));
+};
+
+// Định nghĩa các procedure cho router `employee`
+export const employeeRouter = t.router({
+  // Procedure lấy tất cả các employee
+  getAll: t.procedure.query(() => {
+    return getEmployeesFromLocalStorage(); // Trả về danh sách employee từ localStorage
+  }),
+
+  // Procedure lấy chi tiết một employee dựa vào ID
+  getById: t.procedure.input(z.number()).query(({ input }) => {
+    const employees = getEmployeesFromLocalStorage();
+    const employee = employees.find(emp => emp.id === input);
+    if (!employee) throw new Error('Employee not found');
+    return employee;
+  }),
+
+  // Procedure tạo mới một employee, với input validation
+  create: t.procedure
+    .input(z.object({
+      name: z.string(), 
+      age: z.number(),
+      position: z.string(),
+    }))
+    .mutation(({ input }) => {
+      const employees = getEmployeesFromLocalStorage();
+      const newEmployee = {
+        id: employees.length ? employees[employees.length - 1].id + 1 : 1, // Tạo ID mới
+        ...input,
+      };
+      employees.push(newEmployee); // Thêm employee mới vào danh sách
+      saveEmployeesToLocalStorage(employees); // Lưu lại vào localStorage
+      return newEmployee;
+    }),
+
+  // Procedure chỉnh sửa thông tin employee
+  update: t.procedure
+    .input(z.object({
+      id: z.number(),
+      name: z.string().optional(),
+      age: z.number().optional(),
+      position: z.string().optional(),
+    }))
+    .mutation(({ input }) => {
+      const employees = getEmployeesFromLocalStorage();
+      const index = employees.findIndex(emp => emp.id === input.id);
+      if (index === -1) throw new Error('Employee not found');
+      
+      employees[index] = {
+        ...employees[index],
+        ...input,
+      };
+      saveEmployeesToLocalStorage(employees); // Lưu lại vào localStorage
+      return employees[index];
+    }),
+
+  // Procedure xóa employee
+  delete: t.procedure.input(z.number()).mutation(({ input }) => {
+    const employees = getEmployeesFromLocalStorage();
+    const index = employees.findIndex(emp => emp.id === input);
+    if (index === -1) throw new Error('Employee not found');
+    
+    const [removedEmployee] = employees.splice(index, 1); // Xóa employee khỏi danh sách
+    saveEmployeesToLocalStorage(employees); // Lưu lại vào localStorage
+    return removedEmployee;
+  }),
+});
