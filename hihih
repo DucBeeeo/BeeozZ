@@ -1,0 +1,10 @@
+import org.json.JSONObject;
+
+public class Main {
+    public static void main(String[] args) {
+        String jsonString = "{\"name\":\"John\", \"age\":30, \"city\":\"New York\"}";
+        JSONObject jsonObject = new JSONObject(jsonString);
+        int count = jsonObject.length();
+        System.out.println("Số lượng item: " + count);
+    }
+}
