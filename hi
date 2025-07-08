@@ -1,44 +1,37 @@
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+// ==UserScript==
+// @name         Click 3 lần để tải ảnh
+// @match        *://*/*
+// @grant        none
+// ==/UserScript==
 
-public class SendJsonFile {
-    public static void main(String[] args) {
-        try {
-            // Đọc nội dung file JSON thành chuỗi
-            String jsonInput = new String(Files.readAllBytes(Paths.get("data.json")), "UTF-8");
+(function() {
+  'use strict';
 
-            // Tạo kết nối
-            URL url = new URL("https://example.com/api"); // Thay bằng API thật
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json; utf-8");
-            conn.setDoOutput(true);
+  let clickCount = 0;
+  let clickTimer;
 
-            // Gửi JSON
-            try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = jsonInput.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
-
-            // Đọc response
-            int responseCode = conn.getResponseCode();
-            System.out.println("Response Code: " + responseCode);
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
-            String line;
-            StringBuilder response = new StringBuilder();
-            while ((line = in.readLine()) != null) {
-                response.append(line.trim());
-            }
-            in.close();
-
-            System.out.println("Response: " + response.toString());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+  document.addEventListener('click', function (e) {
+    const target = e.target;
+    if (target.tagName.toLowerCase() === 'img') {
+      clickCount++;
+      if (clickCount === 3) {
+        downloadImage(target.src);
+        clearTimeout(clickTimer);
+        clickCount = 0;
+      }
+      clearTimeout(clickTimer);
+      clickTimer = setTimeout(() => {
+        clickCount = 0;
+      }, 500);
     }
-}
+  });
+
+  function downloadImage(url) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'image.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+})();
