@@ -1,37 +1,79 @@
-// ==UserScript==
-// @name         Click 3 lần để tải ảnh
-// @match        *://*/*
-// @grant        none
-// ==/UserScript==
+// app/page.tsx hoặc pages/index.tsx
+'use client';
+import Image from 'next/image';
+import { useState } from 'react';
 
-(function() {
-  'use strict';
+export default function Home() {
+  const letters = [
+    'h', 'ẵ', 'h', 'ẵ',
+    'k', 'c', 'k', 'a',
+    'â', 's', 'd', 'm',
+    'a', 'e', 'k', 'c',
+    'a', 'k', 't', 'c'
+  ];
 
-  let clickCount = 0;
-  let clickTimer;
+  const targetLetter = 'k';
+  const [clicked, setClicked] = useState<number[]>([]);
 
-  document.addEventListener('click', function (e) {
-    const target = e.target;
-    if (target.tagName.toLowerCase() === 'img') {
-      clickCount++;
-      if (clickCount === 3) {
-        downloadImage(target.src);
-        clearTimeout(clickTimer);
-        clickCount = 0;
-      }
-      clearTimeout(clickTimer);
-      clickTimer = setTimeout(() => {
-        clickCount = 0;
-      }, 500);
+  const handleClick = (idx: number, char: string) => {
+    if (char === targetLetter && !clicked.includes(idx)) {
+      setClicked([...clicked, idx]);
     }
-  });
+  };
 
-  function downloadImage(url) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'image.jpg';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
-})();
+  const count = letters.filter((l) => l === targetLetter).length;
+
+  return (
+    <div className="min-h-screen bg-white p-4 flex flex-col items-center relative overflow-hidden">
+      {/* Góc trên trái - kỳ lân */}
+      <Image
+        src="/unicorn.png"
+        alt="Unicorn"
+        width={80}
+        height={80}
+        className="absolute top-4 left-4"
+      />
+
+      {/* Góc trên phải - bút màu */}
+      <div className="absolute top-4 right-4 text-red-500 font-bold text-lg">
+        Tổng có: <span className="text-blue-800">{count}</span> chữ
+      </div>
+
+      {/* Kính lúp và chữ k */}
+      <div className="flex items-center mt-20 mb-6">
+        <div className="relative w-[80px] h-[80px]">
+          <Image
+            src="/magnifier.png"
+            alt="Magnifier"
+            layout="fill"
+            objectFit="contain"
+          />
+          <div className="absolute inset-0 flex items-center justify-center text-[40px] font-bold text-blue-700">
+            {targetLetter}
+          </div>
+        </div>
+      </div>
+
+      {/* Grid chữ */}
+      <div className="grid grid-cols-4 gap-4 mt-4">
+        {letters.map((char, idx) => (
+          <div
+            key={idx}
+            onClick={() => handleClick(idx, char)}
+            className={`w-16 h-16 border-2 rounded-full flex items-center justify-center text-3xl font-bold cursor-pointer 
+              ${
+                char === targetLetter
+                  ? clicked.includes(idx)
+                    ? 'bg-yellow-300 border-yellow-500'
+                    : 'border-blue-600 text-blue-700'
+                  : 'border-cyan-400 text-cyan-700'
+              }
+            `}
+          >
+            {char}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
