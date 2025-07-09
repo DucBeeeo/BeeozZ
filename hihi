@@ -1,26 +1,84 @@
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+'use client';
+import Image from 'next/image';
+import { useState } from 'react';
 
-public class SendJapaneseJson {
-    public static void main(String[] args) throws Exception {
-        Path filePath = Path.of("duong-dan/file.json"); // file chứa tiếng Nhật
+export default function Home() {
+  const letters = [
+    'h', 'ẵ', 'h', 'ẵ',
+    'k', 'c', 'k', 'a',
+    'â', 's', 'd', 'm',
+    'a', 'e', 'k', 'c',
+    'a', 'k', 't', 'c'
+  ];
 
-        // Đọc nội dung file UTF-8
-        String json = Files.readString(filePath, StandardCharsets.UTF_8);
+  const targetLetter = 'k';
+  const [clicked, setClicked] = useState<Record<number, boolean>>({});
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://example.com/api"))
-            .header("Content-Type", "application/json; charset=UTF-8")
-            .POST(HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8))
-            .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        System.out.println("Phản hồi: " + response.body());
+  const handleClick = (idx: number) => {
+    if (clicked[idx] === undefined) {
+      setClicked((prev) => ({ ...prev, [idx]: true }));
     }
+  };
+
+  const count = letters.filter((l) => l === targetLetter).length;
+
+  return (
+    <div className="min-h-screen bg-white p-4 flex flex-col items-center relative overflow-hidden">
+      {/* Góc trên trái - kỳ lân */}
+      <Image
+        src="/unicorn.png"
+        alt="Unicorn"
+        width={80}
+        height={80}
+        className="absolute top-4 left-4"
+      />
+
+      {/* Góc trên phải - bút màu */}
+      <div className="absolute top-4 right-4 text-red-500 font-bold text-lg">
+        Tổng có: <span className="text-blue-800">{count}</span> chữ
+      </div>
+
+      {/* Kính lúp */}
+      <div className="flex items-center mt-20 mb-6">
+        <div className="relative w-[80px] h-[80px]">
+          <Image
+            src="/magnifier.png"
+            alt="Magnifier"
+            layout="fill"
+            objectFit="contain"
+          />
+          <div className="absolute inset-0 flex items-center justify-center text-[40px] font-bold text-blue-700">
+            {targetLetter}
+          </div>
+        </div>
+      </div>
+
+      {/* Lưới chữ */}
+      <div className="grid grid-cols-4 gap-4 mt-4">
+        {letters.map((char, idx) => {
+          const wasClicked = clicked[idx] !== undefined;
+          const isCorrect = char === targetLetter;
+
+          let bgColor = 'border-cyan-400 text-cyan-700'; // mặc định
+          if (wasClicked) {
+            bgColor = isCorrect
+              ? 'bg-yellow-300 border-yellow-500 text-black'
+              : 'bg-gray-300 border-gray-400 text-white';
+          } else if (isCorrect) {
+            bgColor = 'border-blue-600 text-blue-700';
+          }
+
+          return (
+            <div
+              key={idx}
+              onClick={() => handleClick(idx)}
+              className={`w-16 h-16 border-2 rounded-full flex items-center justify-center text-3xl font-bold cursor-pointer transition-colors duration-200 ${bgColor}`}
+            >
+              {char}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
