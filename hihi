@@ -12,6 +12,105 @@ export default function Home() {
   ];
 
   const targetLetter = 'k';
+
+  const [correctClicked, setCorrectClicked] = useState<number[]>([]);
+  const [wrongClicked, setWrongClicked] = useState<number[]>([]);
+
+  const handleClick = (idx: number, char: string) => {
+    if (correctClicked.includes(idx) || wrongClicked.includes(idx)) return;
+
+    if (char === targetLetter) {
+      setCorrectClicked([...correctClicked, idx]);
+    } else {
+      setWrongClicked([...wrongClicked, idx]);
+
+      // Sau 3 giây xóa khỏi danh sách sai
+      setTimeout(() => {
+        setWrongClicked((prev) => prev.filter((i) => i !== idx));
+      }, 3000);
+    }
+  };
+
+  const count = letters.filter((l) => l === targetLetter).length;
+
+  return (
+    <div className="min-h-screen bg-white p-4 flex flex-col items-center relative overflow-hidden">
+      {/* Góc trái */}
+      <Image
+        src="/unicorn.png"
+        alt="Unicorn"
+        width={80}
+        height={80}
+        className="absolute top-4 left-4"
+      />
+
+      {/* Tổng chữ */}
+      <div className="absolute top-4 right-4 text-red-500 font-bold text-lg">
+        Tổng có: <span className="text-blue-800">{count}</span> chữ
+      </div>
+
+      {/* Kính lúp */}
+      <div className="flex items-center mt-20 mb-6">
+        <div className="relative w-[80px] h-[80px]">
+          <Image
+            src="/magnifier.png"
+            alt="Magnifier"
+            layout="fill"
+            objectFit="contain"
+          />
+          <div className="absolute inset-0 flex items-center justify-center text-[40px] font-bold text-blue-700">
+            {targetLetter}
+          </div>
+        </div>
+      </div>
+
+      {/* Grid */}
+      <div className="grid grid-cols-4 gap-4 mt-4">
+        {letters.map((char, idx) => {
+          const isCorrect = correctClicked.includes(idx);
+          const isWrong = wrongClicked.includes(idx);
+
+          let className = 'border-cyan-400 text-cyan-700'; // Mặc định
+
+          if (isCorrect) {
+            className = 'bg-yellow-300 border-yellow-500 text-black';
+          } else if (isWrong) {
+            className = 'bg-gray-300 border-gray-400 text-white';
+          } else if (char === targetLetter) {
+            className = 'border-blue-600 text-blue-700';
+          }
+
+          return (
+            <div
+              key={idx}
+              onClick={() => handleClick(idx, char)}
+              className={`w-16 h-16 border-2 rounded-full flex items-center justify-center text-3xl font-bold cursor-pointer transition-colors duration-300 ${className}`}
+            >
+              {char}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+
+
+'use client';
+import Image from 'next/image';
+import { useState } from 'react';
+
+export default function Home() {
+  const letters = [
+    'h', 'ẵ', 'h', 'ẵ',
+    'k', 'c', 'k', 'a',
+    'â', 's', 'd', 'm',
+    'a', 'e', 'k', 'c',
+    'a', 'k', 't', 'c'
+  ];
+
+  const targetLetter = 'k';
   const [clicked, setClicked] = useState<Record<number, boolean>>({});
 
   const handleClick = (idx: number) => {
